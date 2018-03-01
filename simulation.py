@@ -2,6 +2,8 @@
 f = open("a_example.in", "r", encoding="utf-8")
 first = True
 paramsData = list(map(int,f.readline().split(' '))) # R,C,F,N,B,T
+B = paramsData[4]
+F = paramsData[2]
 ridesData = [] # Rides input data
 for line in f:
         ridesData.append(list(map(int,line[:-1].split(' '))))
@@ -24,8 +26,8 @@ class Ride:
             print("bad")
             return
         start_pos = [vals[0], vals[1]]
-        end_pos   = [vals[2], vals[3]]
-        start_time= vals[4]
+        end_pos  = [vals[2], vals[3]]
+        start_time = vals[4]
         end_time  = vals[5]
     def distance(self):
         return abs(start_pos[0]-end_pos[0])+abs(start_pos[1]-end_pos[1])
@@ -36,6 +38,7 @@ class Vehicle:
         self.assignedRides = []
         self.currentRideId = 0
         self.pos = [0,0]
+        self.scoreCache = 0
 
         self.intentState = 2 # 0 = Going to start, 1 = Going to end, 2 = Waiting, 3 = Done
         self.movementState = 0 # 0 = Going across, 1 = Going vertical
@@ -43,29 +46,48 @@ class Vehicle:
     def assign(self,ride):
         self.assignedRides.append(ride)
 
-    def next(self,ride):
-        self.assignedRide = ride
-        if self.pos == ride.start_pos:
-            self.intentState = 1
+    def next(self,currentTime):
+        self.currentRideId += 1
+        if self.currentRideId == len(assignedRides):
+            self.intentState = 3
         else:
-            self.intentState = 0
-            if self.pos[0] != ride.start_pos[0]:
-                self.movementState = 0
+            target = self.assignedRides[self.currentRideId].start_pos
+            if self.pos == target:
+                self.intentState = 1
             else:
-                self.movementState = 1
+                self.intentState = 0
+
+            # Check whether to wait on or discard current ride
+            ride = self.assignedRides[self.currentRideId]
+
+            if currentTime < ride.start_time:
+                self.intentState = 2
+
+            if currentTime > ride.end_time - ride.start_time:
+                next(self,currentTime)
 
     def step(self,currentTime):
+        if currentTime == 0:
+            if len(self.assignedRides) == 0:
+                self.intentState = 3
+                return 0
         target = []
         if self.intentState == 0:
             target = self.assignedRides[currentRideId].start_pos
         elif self.intentState == 1:
             target = self.assignedRide[currentRideId].end_pos
-        elif self.intentState = 2:
-            # Check if start next ride
+        elif self.intentState == 2:
+            ride = self.assignedRides[self.currentRideId]
+            if currentTime == ride.start_time:
+                self.intentState = 0
+                self.scoreCache += B
+                step(self,currentTime)
+                return 0
         else:
-            return
+            return 0
 
         # Going across so move across
+        done = False
         if self.movementState == 0:
             if self.pos[0]<target[0]:
                 self.pos[0] += 1
@@ -74,7 +96,7 @@ class Vehicle:
 
             # Check    
             if self.pos == target:
-                self.intentState == 2
+                done = True
             elif self.pos[0] == target[0]:
                 self.movementState == 1
                 
@@ -87,7 +109,15 @@ class Vehicle:
 
             # Check    
             if self.pos == target:
-                self.intentState == 2
+                done = True
+
+        if done:
+            # Return a score
+            self.scoreCache += self.assignedRides[self.currentRideId].distance()
+            next(self,currentTime)
+            temp = self.scoreCache
+            self.scoreCache = 0
+            return(temp)
                 
 
 rides = [0] * paramsData[3]
@@ -107,10 +137,15 @@ def simulate(rides,grid,vehicles,schedule):
     
     for t in range(0,grid.max_time): # Time step
         for vehicleId in range(0,len(vehicles)):
-            vehicles[vehicleId].step(t)
-            
+            score += vehicles[vehicleId].step(t)
+
+    print(score)
+
+sch = [[2,0,2],[1,1]]
+for j in range(2,F):
+    sch[j] = [0]
                
-simulate(rides,grid,vehicles,0)
+simulate(rides,grid,vehicles,sch)
             
             
 
