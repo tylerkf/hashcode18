@@ -1,11 +1,8 @@
 import numpy as np
 import random
 
-def fitness(r):
-    return 1
+def fitness(sol):
 
-def fitnessMany(r):
-    return 1
 
 def nodesToArcs(route):
     nLast = -1
@@ -109,18 +106,29 @@ def selection(routes, fitness, min):
     return newRoutes
 
 def main():
-    sol1 = [
-        [0, 2, 1, 3],
-        [0, 4, 5, 6],
-        [0, 8, 9, 10]
-    ]
-    sol2 = [
-        [0, 8, 4, 3],
-        [0, 1, 9, 5],
-        [0, 2, 6, 7]
-    ]
-    print(cnxCrossover(sol1, sol2, 9, 3))
+    NUM_MAX = 5
+    NUM_ROUTES = 3
+    NUM_NODES = 9
+    solutions = []
+    while True:
+        for s in solutions:
+            fitnesses.append(fitness(s))
 
+        npFitnesses = np.array(fitnesses)
+
+        best = []
+        for i in range(0, NUM_MAX):
+            curMax = np.append(np.argmax(npFitnesses))
+            npFitnesses[curMax] = 0
+            best.append(curMax)
+        print(npFitnesses[best[0]])
+        print(solutions[best[0]])
+
+        offspring = []
+        for i in range(0, NUM_MAX):
+            for j in range(i, NUM_MAX):
+                offspring.append(cnxCrossover([], [], NUM_NODES, NUM_ROUTES))
+        solutions = offspring
 
 
 if __name__ == '__main__':
