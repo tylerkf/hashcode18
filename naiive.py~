@@ -1,0 +1,13 @@
+def naiive_solution():
+    vehicle_rides = []
+    for i in range(grid.vehicles):
+        vehicle_rides.append([])      
+    for i in range(0,grid.num_rides):
+        vehicle_rides[i%grid.vehicles].append(i)
+        print(vehicle_rides)
+    for i in vehicle_rides:
+        lin = str(len(i))
+        for j in range(0, len(i)):
+            lin+=" "+str(i[j])
+        print(lin)
+naiive_solution()

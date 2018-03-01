@@ -1,0 +1,21 @@
+class map:
+    def __init__(self, vals, lines):
+        self.rows = vals[0]
+        self.columns = vals[1]
+        self.vehicles = vals[2]
+        self.num_rides = vals[3]
+        self.bonus = vals[4]
+        self.max_time = vals[5]
+        for line_no in range(0,num_rides):
+            rides[line_no] = ride(lines[line_no])
+
+
+class ride:
+    def __init__(self, vals):
+        start_pos = [vals[0], vals[1]]
+        end_pos   = [vals[2], vals[3]]
+        start_time= vals[4]
+        end_time  = vals[5]
+        
+    
+        
