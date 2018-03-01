@@ -25,12 +25,12 @@ class Ride:
         if(len(vals)!=6):
             print("bad")
             return
-        start_pos = [vals[0], vals[1]]
-        end_pos  = [vals[2], vals[3]]
-        start_time = vals[4]
-        end_time  = vals[5]
+        self.start_pos = [vals[0], vals[1]]
+        self.end_pos  = [vals[2], vals[3]]
+        self.start_time = vals[4]
+        self.end_time  = vals[5]
     def distance(self):
-        return abs(start_pos[0]-end_pos[0])+abs(start_pos[1]-end_pos[1])
+        return abs(self.start_pos[0]-self.end_pos[0])+abs(self.start_pos[1]-self.end_pos[1])
 
 class Vehicle:
     def __init__(self,id):
@@ -46,9 +46,9 @@ class Vehicle:
     def assign(self,ride):
         self.assignedRides.append(ride)
 
-    def next(self,currentTime):
+    def nextT(self,currentTime):
         self.currentRideId += 1
-        if self.currentRideId == len(assignedRides):
+        if self.currentRideId == len(self.assignedRides):
             self.intentState = 3
         else:
             target = self.assignedRides[self.currentRideId].start_pos
@@ -64,7 +64,7 @@ class Vehicle:
                 self.intentState = 2
 
             if currentTime > ride.end_time - ride.start_time:
-                next(self,currentTime)
+                self.nextT(currentTime)
 
     def step(self,currentTime):
         if currentTime == 0:
@@ -73,16 +73,17 @@ class Vehicle:
                 return 0
         target = []
         if self.intentState == 0:
-            target = self.assignedRides[currentRideId].start_pos
+            target = self.assignedRides[self.currentRideId].start_pos
         elif self.intentState == 1:
-            target = self.assignedRide[currentRideId].end_pos
+            target = self.assignedRide[self.currentRideId].end_pos
         elif self.intentState == 2:
             ride = self.assignedRides[self.currentRideId]
             if currentTime == ride.start_time:
                 self.intentState = 0
                 self.scoreCache += B
-                step(self,currentTime)
+                self.step(currentTime)
                 return 0
+            return 0
         else:
             return 0
 
@@ -114,10 +115,12 @@ class Vehicle:
         if done:
             # Return a score
             self.scoreCache += self.assignedRides[self.currentRideId].distance()
-            next(self,currentTime)
+            self.nextT(currentTime)
             temp = self.scoreCache
             self.scoreCache = 0
             return(temp)
+
+        return 0
                 
 
 rides = [0] * paramsData[3]
