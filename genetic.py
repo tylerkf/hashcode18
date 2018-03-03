@@ -127,14 +127,15 @@ class Vehicle:
 
 def simulate(rides,grid,vehicles,schedule):
     score = 0
-
+    print("Schedule:  ", schedule)
     # Setting up each vehicle
     for vehicleId in range(0,len(vehicles)):
         vehicleSchedule = schedule[vehicleId]
         M = vehicleSchedule[0]
+        print("M: ", M)
         for i in range(1,M+1):
-            vehicles[vehicleId].assign(rides[vehicleSchedule[i]])
-
+                print(i)
+                vehicles[vehicleId].assign(rides[vehicleSchedule[i]])
 
     for t in range(0,grid.max_time): # Time step
         for vehicleId in range(0,len(vehicles)):
@@ -144,7 +145,6 @@ def simulate(rides,grid,vehicles,schedule):
 
 def fitness(sol, rides, grid, vehicles):
     return simulate(rides,grid,vehicles,sol)
-
 
 def nodesToArcs(route):
     nLast = -1
@@ -244,28 +244,24 @@ def cnxCrossover(sol1, sol2, numNodes, numRoutes):
     return sol
 
 def naiive_solution(rides, grid):
-    rc = []
-    vehicle_rides = []
-    for i in range(grid.vehicles):
-        vehicle_rides.append([])
-    for i in range(0,grid.num_rides):
-        vehicle_rides[randint(0, grid.vehicles-1)].append(i)
-    for i in vehicle_rides:
-        lin = []
-        for j in range(1, len(i)):
-            lin.append(i[j])
-        rc.append(lin)
-    return rc
-
-
+        vehicle_rides = []
+        for i in range(grid.vehicles):
+                vehicle_rides.append([])
+        for i in range(0,grid.num_rides):
+                vehicle_rides[randint(0, grid.vehicles-1)].append(i)
+        for i in range(0,grid.vehicles):
+                vehicle_rides[i].insert(0, len(vehicle_rides[i]))
+        return vehicle_rides
 
 def main(rides, grid, vehicles, numNodes, numRoutes):
     NUM_MAX = 5
-    solutions = naiive_solution(rides, grid)
+    solutions = []
+    for i in range(0, grid.num_rides):
+            solutions.append(naiive_solution(rides, grid))
     while True:
         fitnesses = []
         for s in solutions:
-            fitnesses.append(fitness(rides, grid, vehicles, s))
+           fitnesses.append(fitness(s, rides, grid, vehicles))
         npFitnesses = np.array(fitnesses)
 
         best = []
@@ -282,9 +278,8 @@ def main(rides, grid, vehicles, numNodes, numRoutes):
                 offspring.append(cnxCrossover([], [], numNodes, numRoutes + 1))
         solutions = offspring
 
-
 rides = [0] * paramsData[3]
 grid = Grid(paramsData,ridesData)
 vehicles = [Vehicle(i) for i in range(paramsData[2])]
-#main(rides, grid, vehicles, paramsData[3], paramsData[2])
-print(naiive_solution(rides, grid))
+main(rides, grid, vehicles, paramsData[3], paramsData[2])
+#print(naiive_solution(rides, grid))
