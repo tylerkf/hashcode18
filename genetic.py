@@ -3,7 +3,7 @@ import random
 from random import randint
 
 import simulation as sim
-sim.loadProblem("problems/e_high_bonus.in")
+sim.loadProblem("problems/b_should_be_easy.in")
 
 def fitness(sol):
     return sim.simulate(sol,False)

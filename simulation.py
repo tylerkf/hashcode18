@@ -58,6 +58,9 @@ def simulate(solution, inSubmissionFormat):
         t = 0
         pos = [0,0]
         for j in range(0, len(schedule)):
+            if schedule[j] >= Simulator.N:
+                print("Tried to get ride that doesn't exist", schedule[j], ">= N", Simulator.N)
+                continue
             ride = Simulator.rides[schedule[j]]
 
             # Coordinates
