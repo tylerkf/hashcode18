@@ -1,156 +1,89 @@
 
-f = open("a_example.in", "r", encoding="utf-8")
-first = True
-paramsData = list(map(int,f.readline().split(' '))) # R,C,F,N,B,T
-B = paramsData[4]
-F = paramsData[2]
-ridesData = [] # Rides input data
-for line in f:
-        ridesData.append(list(map(int,line[:-1].split(' '))))
+class Simulator:
+    # Problem Parameters
+    R = 0 # Number of rows in Grid
+    C = 0 # Number of columns in Grid
+    F = 0 # Number of vehicles in fleet
+    N = 0 # Number of rides
+    B = 0 # Per ride bonus for starting the ride on time
+    T = 0 # Number of steps in simulation
 
-class Grid:
-    def __init__(self, vals, lines):
-        self.rows = vals[0]
-        self.columns = vals[1]
-        self.vehicles = vals[2]
-        self.num_rides = vals[3]
-        self.bonus = vals[4]
-        self.max_time = vals[5]
-        for line_no in range(0,self.num_rides):
-            rides[line_no] = Ride(lines[line_no])
+    # Array storing rides
+    rides = []
 
 
-class Ride:
-    def __init__(self, vals):
-        if(len(vals)!=6):
-            print("bad")
-            return
-        self.start_pos = [vals[0], vals[1]]
-        self.end_pos  = [vals[2], vals[3]]
-        self.start_time = vals[4]
-        self.end_time  = vals[5]
-    def distance(self):
-        return abs(self.start_pos[0]-self.end_pos[0])+abs(self.start_pos[1]-self.end_pos[1])
+# Loads in problem parameters and rides
+def loadProblem(filename):
+    f = open(filename, "r", encoding="utf-8")
 
-class Vehicle:
-    def __init__(self,id):
-        self.id = id
-        self.assignedRides = []
-        self.currentRideId = 0
-        self.pos = [0,0]
-        self.scoreCache = 0
+    # Loading parameters
+    paramsData = list(map(int,f.readline().split(' '))) # R,C,F,N,B,T
+    Simulator.R = paramsData[0]
+    Simulator.C = paramsData[1]
+    Simulator.F = paramsData[2]
+    Simulator.N = paramsData[3]
+    Simulator.B = paramsData[4]
+    Simulator.T = paramsData[5]
 
-        self.intentState = 2 # 0 = Going to start, 1 = Going to end, 2 = Waiting, 3 = Done
-        self.movementState = 0 # 0 = Going across, 1 = Going vertical
+    # Loading rides
+    Simulator.rides = [0] * Simulator.N
+    for i in range(0,Simulator.N):
+        raw = list(map(int,f.readline()[:-1].split(' ')))
+        ride = []
+        ride.append([raw[0],raw[1]]) # Start coords
+        ride.append([raw[2],raw[3]]) # End coords
+        ride.append(raw[4]) # Earliest start
+        ride.append(raw[5]) # Latest finish
 
-    def assign(self,ride):
-        self.assignedRides.append(ride)
+        Simulator.rides[i] = ride;
 
-    def nextT(self,currentTime):
-        self.currentRideId += 1
-        if self.currentRideId == len(self.assignedRides):
-            self.intentState = 3
-        else:
-            target = self.assignedRides[self.currentRideId].start_pos
-            if self.pos == target:
-                self.intentState = 1
-            else:
-                self.intentState = 0
-
-            # Check whether to wait on or discard current ride
-            ride = self.assignedRides[self.currentRideId]
-
-            if currentTime < ride.start_time:
-                self.intentState = 2
-
-            if currentTime > ride.end_time - ride.start_time:
-                self.nextT(currentTime)
-
-    def step(self,currentTime):
-        if currentTime == 0:
-            if len(self.assignedRides) == 0:
-                self.intentState = 3
-                return 0
-        target = []
-        if self.intentState == 0:
-            target = self.assignedRides[self.currentRideId].start_pos
-        elif self.intentState == 1:
-            target = self.assignedRide[self.currentRideId].end_pos
-        elif self.intentState == 2:
-            ride = self.assignedRides[self.currentRideId]
-            if currentTime == ride.start_time:
-                self.intentState = 0
-                self.scoreCache += B
-                self.step(currentTime)
-                return 0
-            return 0
-        else:
-            return 0
-
-        # Going across so move across
-        done = False
-        if self.movementState == 0:
-            if self.pos[0]<target[0]:
-                self.pos[0] += 1
-            else:
-                self.pos[0] -= 1
-
-            # Check    
-            if self.pos == target:
-                done = True
-            elif self.pos[0] == target[0]:
-                self.movementState == 1
-                
-        # Going vertical so move up or down                   
-        else:
-            if self.pos[1]<target[1]:
-                self.pos[1] += 1
-            else:
-                self.pos[1] -= 1
-
-            # Check    
-            if self.pos == target:
-                done = True
-
-        if done:
-            # Return a score
-            self.scoreCache += self.assignedRides[self.currentRideId].distance()
-            self.nextT(currentTime)
-            temp = self.scoreCache
-            self.scoreCache = 0
-            return(temp)
-
-        return 0
-                
-
-rides = [0] * paramsData[3]
-grid = Grid(paramsData,ridesData)
-vehicles = [Vehicle(i) for i in range(paramsData[2])]
-
-def simulate(rides,grid,vehicles,schedule):
+# Scores given solution
+def simulate(solution, inSubmissionFormat):
     score = 0
 
-    # Setting up each vehicle
-    for vehicleId in range(0,len(vehicles)):
-        vehicleSchedule = schedule[vehicleId]
-        M = vehicleSchedule[0]
-        for i in range(1,M+1):
-            vehicles[vehicleId].assign(rides[vehicleSchedule[i]])
+    if len(solution) > Simulator.F:
+        print("That many taxis does not exist!")
+        print(Simulator.F,"<", len(solution))
 
-    
-    for t in range(0,grid.max_time): # Time step
-        for vehicleId in range(0,len(vehicles)):
-            score += vehicles[vehicleId].step(t)
+    if len(solution) < Simulator.F:
+        print("Note that the problem allows", Simulator.F, "taxis but the given solution only utilises", len(solution))
 
-    print(score)
+    for i in range(0, min(Simulator.F,len(solution))):
+        schedule = 0
+        if inSubmissionFormat:
+            schedule = solution[i][1:]
+        else:
+            schedule = solution[i]
 
-sch = [[2,0,2],[1,1]]
-for j in range(2,F):
-    sch[j] = [0]
-               
-simulate(rides,grid,vehicles,sch)
-            
-            
+        t = 0
+        pos = [0,0]
+        for j in range(0, len(schedule)):
+            ride = Simulator.rides[schedule[j]]
 
+            # Coordinates
+            start = ride[0]
+            end = ride[1]
 
+            # Times
+            earliest = ride[2]
+            latest = ride[3]
 
+            journey_length = abs(start[0] - end[0]) + abs(start[1] - end[1])
+            start_length = abs(pos[0] - start[0]) + abs(pos[1] - start[1])
+            total_length = start_length + journey_length
+
+            end_t = max(earliest + journey_length - 1, t + total_length - 1)
+
+            if end_t >= Simulator.T:
+                continue
+
+            if end_t <= latest:
+                score += journey_length
+
+                if t + start_length - 1 <= earliest:
+                    score += Simulator.B
+
+                t = end_t
+                pos = end
+
+    return(score)
