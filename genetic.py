@@ -6,7 +6,9 @@ import simulation as sim
 sim.loadProblem("problems/b_should_be_easy.in")
 
 def fitness(sol):
-    return sim.simulate(sol,False)
+    f = sim.simulate(sol,False)
+    print("Fitness of",f)
+    return f
 
 def nodesToArcs(route):
     nLast = -1
