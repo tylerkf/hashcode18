@@ -108,12 +108,12 @@ def cnxCrossover(sol1, sol2, numNodes, numRoutes):
     return sol
 
 def naiive_solution():
-        vehicle_rides = [[]] * sim.Simulator.F
-        for i in range(0,sim.Simulator.N):
-                vehicle_rides[randint(0, sim.Simulator.F-1)].append(i)
-        for i in range(0,sim.Simulator.F):
-                vehicle_rides[i].insert(0, len(vehicle_rides[i]))
-        return vehicle_rides
+    vehicle_rides = [[]] * sim.Simulator.F
+    for i in range(0,sim.Simulator.N):
+        vehicle_rides[randint(0, sim.Simulator.F-1)].append(i)
+    for i in range(0,sim.Simulator.F):
+        vehicle_rides[i].insert(0, len(vehicle_rides[i]))
+    return vehicle_rides
 
 def main(numNodes, numRoutes):
     NUM_MAX = 5
