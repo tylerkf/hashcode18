@@ -75,7 +75,7 @@ def simulate(solution, inSubmissionFormat):
             start_length = abs(pos[0] - start[0]) + abs(pos[1] - start[1])
             total_length = start_length + journey_length
 
-            end_t = max(earliest + journey_length - 1, t + total_length - 1)
+            end_t = max(earliest + journey_length, t + total_length)
 
             if end_t >= Simulator.T:
                 continue
@@ -83,7 +83,7 @@ def simulate(solution, inSubmissionFormat):
             if end_t <= latest:
                 score += journey_length
 
-                if t + start_length - 1 <= earliest:
+                if t + start_length <= earliest:
                     score += Simulator.B
 
                 t = end_t
