@@ -9,4 +9,4 @@ Our submission to the 2018 **Google Hashcode Challenge**
 * **Joe Shuttleworth** (joeshutts)
 * **Tyler Farghly** (tylerkf)
 * **Harvey Williams** (harveynw)
-* **David Newham**
+* **David Newham** (davenewham)
