@@ -11,6 +11,12 @@ class Simulator:
     # Array storing rides
     rides = []
 
+    # Get length of ride
+    def getRideLength(self,ride):
+        start = rides[ride][0]
+        end = rides[ride][1]
+
+        return abs(start[0] - end[0]) + abs(start[1] - end[1])
 
 # Loads in problem parameters and rides
 def loadProblem(filename):
@@ -38,7 +44,7 @@ def loadProblem(filename):
         Simulator.rides[i] = ride;
 
 # Scores given solution
-def simulate(solution, inSubmissionFormat):
+def simulate(solution, inSubmissionFormat=False):
     score = 0
 
     if len(solution) > Simulator.F:
@@ -78,15 +84,14 @@ def simulate(solution, inSubmissionFormat):
             end_t = max(earliest + journey_length, t + total_length)
 
             if end_t >= Simulator.T:
-                continue
+                break
 
             if end_t <= latest:
                 score += journey_length
-
-                if t + start_length <= earliest:
-                    score += Simulator.B
-
-                t = end_t
-                pos = end
+                
+            if t + start_length <= earliest:
+                score += Simulator.B
+            t = end_t
+            pos = end
 
     return(score)

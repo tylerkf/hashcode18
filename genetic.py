@@ -1,9 +1,10 @@
 import numpy as np
 import random
 from random import randint
-
 import simulation as sim
-sim.loadProblem("problems/b_should_be_easy.in")
+
+#sim.loadProblem("problems/b_should_be_easy.in")
+sim.loadProblem("problems/c_no_hurry.in")
 
 def fitness(sol):
     f = sim.simulate(sol,False)
@@ -20,8 +21,8 @@ def nodesToArcs(route):
     return arcs
 
 def getArcTrail(arcs, added, notInSolution, node):
-    print(added)
-    print(notInSolution)
+   # print(added)
+    #print(notInSolution)
     nextNode = -1
     for a in arcs:
         if a[0] == node:
@@ -57,7 +58,8 @@ def cnxCrossover(sol1, sol2, numNodes, numRoutes):
         else:
             spareNodes.append(a[0])
 
-    spareNodes.remove(0)
+    if len(spareNodes) >= 1:
+              spareNodes.remove(0)
 
     # RANDOMLY BUILDING SOLUTION
     # creates routes from 0 arcs
@@ -108,7 +110,7 @@ def cnxCrossover(sol1, sol2, numNodes, numRoutes):
     return sol
 
 def naiive_solution():
-    vehicle_rides = [[]] * sim.Simulator.F
+    vehicle_rides = [[] for v in range(sim.Simulator.F)]
     for i in range(0,sim.Simulator.N):
         vehicle_rides[randint(0, sim.Simulator.F-1)].append(i)
     for i in range(0,sim.Simulator.F):
@@ -128,11 +130,12 @@ def main(numNodes, numRoutes):
 
         best = []
         for i in range(0, NUM_MAX):
-            curMax = np.append(np.argmax(npFitnesses))
-            npFitnesses[curMax] = 0
-            best.append(curMax)
-        print(npFitnesses[best[0]])
-        print(solutions[best[0]])
+         curMax = np.argmax(npFitnesses)
+         npFitnesses = np.append(npFitnesses, curMax)
+         npFitnesses[curMax] = 0
+         best.append(curMax)
+#        print(fitnesses[best[0]])
+        #print(solutions[best[0]])
 
         offspring = []
         for i in range(0, NUM_MAX):
